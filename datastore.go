@@ -5,6 +5,25 @@ import (
 	"appengine/datastore"
 )
 
+type App struct {
+	Name        string
+	TryDuration int64
+}
+
+func appKey(c appengine.Context) *datastore.Key {
+	return datastore.NewKey(c, "App", "default_app", 0, nil)
+}
+
+func (a *App) Save(c appengine.Context) error {
+	key := datastore.NewIncompleteKey(c, "App", appKey(c))
+	_, err := datastore.Put(c, key, a)
+	return err
+}
+
+func FindApp(c appengine.Context) *datastore.Query {
+	return datastore.NewQuery("App").Ancestor(appKey(c))
+}
+
 type Account struct {
 	Email      string
 	Authorized bool

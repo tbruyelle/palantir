@@ -68,6 +68,9 @@ func logoutHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 	return nil
 }
 
+// Default try duration 15j
+const DefaultTryDuration int64 = 15 * 3600
+
 func registerHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 	id := r.FormValue("id")
 	if id == "" {
@@ -86,8 +89,24 @@ func registerHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 		return err
 	}
 	if len(registrations) > 0 {
-		// Registration found
-		fmt.Fprintf(w, "exists %+v", registrations[0])
+		// Registration found, find the corresponding App
+		reg := registrations[0]
+		q = FindApp(c).Filter("Name=", reg.App)
+		var apps []App
+		if _, err := q.GetAll(c, &apps); err != nil {
+			return err
+		}
+		tryDuration := DefaultTryDuration
+		if len(apps) > 1 {
+			tryDuration = apps[0].TryDuration
+		}
+		// Check if tryDuration has expired
+		if reg.Date+tryDuration < time.Now().Unix() {
+			// tryDuration expired
+			fmt.Fprintf(w, "expired %+v", reg)
+		} else {
+			fmt.Fprintf(w, "in try duration %+v", reg)
+		}
 		return nil
 	}
 	// Not found create it
