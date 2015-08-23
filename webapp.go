@@ -103,9 +103,11 @@ func registerHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 		// Check if tryDuration has expired
 		if reg.Date+tryDuration < time.Now().Unix() {
 			// tryDuration expired
-			fmt.Fprintf(w, "expired %+v", reg)
+			c.Infof("expired %+v", reg)
+			fmt.Fprintf(w, "EXPIRED")
 		} else {
-			fmt.Fprintf(w, "in try duration %+v", reg)
+			c.Infof("in try duration %+v", reg)
+			fmt.Fprintf(w, "OK")
 		}
 		return nil
 	}
@@ -119,6 +121,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Fprintf(w, "Created %+v", reg)
+	c.Infof("Created %+v", reg)
+	fmt.Fprintf(w, "OK")
 	return nil
 }
