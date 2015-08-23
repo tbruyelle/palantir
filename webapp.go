@@ -4,7 +4,6 @@ import (
 	"appengine/user"
 	"fmt"
 	"github.com/gorilla/mux"
-	"html/template"
 	"net/http"
 	"time"
 )
@@ -25,11 +24,6 @@ func rootHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 		http.NotFound(w, r)
 		return nil
 	}
-	tmpl, err := template.ParseFiles("templates/root.tpl", "templates/home.tpl")
-	if err != nil {
-		return err
-	}
-
 	registrations := make([]Registration, 0, 20)
 	if c.user != nil {
 		// Fetch registrations
@@ -46,8 +40,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 		c.user,
 		registrations,
 	}
-	tmpl.Execute(w, data)
-	return nil
+	return tmpl(w, "home.tpl", data)
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request, c Context) error {

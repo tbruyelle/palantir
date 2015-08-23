@@ -8,7 +8,7 @@
         </thead>
         <tbody>
         {{range .Registrations}}
-            <tr><td>{{.ID}}</td><td>{{.App}}</td><td>{{.Date}}</td></tr>
+            <tr><td>{{.ID}}</td><td>{{.App}}</td><td>{{.Date | formatDate}}</td></tr>
         {{end}}
         </tbody>
     </table>
