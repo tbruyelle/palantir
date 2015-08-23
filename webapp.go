@@ -2,6 +2,7 @@ package appengine_bootstrap
 
 import (
 	"appengine/user"
+	"fmt"
 	"github.com/gorilla/mux"
 	"html/template"
 	"net/http"
@@ -78,10 +79,27 @@ func registerHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 		http.Error(w, "Missing parameter", http.StatusBadRequest)
 		return nil
 	}
+	// Check if registration exists
+	q := FindRegistration(c).Filter("ID=", id).Filter("App=", app)
+	var registrations []Registration
+	if _, err := q.GetAll(c, &registrations); err != nil {
+		return err
+	}
+	if len(registrations) > 0 {
+		// Registration found
+		fmt.Fprintf(w, "exists %+v", registrations[0])
+		return nil
+	}
+	// Not found create it
 	reg := &Registration{
 		ID:   id,
 		App:  app,
 		Date: time.Now().Unix(),
 	}
-	return reg.Save(c)
+	err := reg.Save(c)
+	if err != nil {
+		return err
+	}
+	fmt.Fprintf(w, "Created %+v", reg)
+	return nil
 }

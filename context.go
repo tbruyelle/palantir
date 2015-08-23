@@ -41,7 +41,7 @@ func _handle(h ctxHandler, assertLogged bool) http.HandlerFunc {
 			//	http.Redirect(w, r, "/", http.StatusFound)
 			//	return
 			//}
-			c.Infof("Looking for authorized account %s", c.user.Email)
+			c.Infof("Looking for authorized account %+v", c.user)
 			if !c.user.Admin {
 				q := FindAccount(c).Filter("Email = ", c.user.Email)
 				var accounts []Account
