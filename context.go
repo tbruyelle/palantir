@@ -19,8 +19,6 @@ var (
 	}
 )
 
-const Admin = "thomas.bruyelle@gmail.com"
-
 type ctxHandler func(http.ResponseWriter, *http.Request, Context) error
 
 func handle(h ctxHandler) http.HandlerFunc {
@@ -44,7 +42,7 @@ func _handle(h ctxHandler, assertLogged bool) http.HandlerFunc {
 			//	return
 			//}
 			c.Infof("Looking for authorized account %s", c.user.Email)
-			if c.user.Email != Admin {
+			if !c.user.Admin {
 				q := FindAccount(c).Filter("Email = ", c.user.Email)
 				var accounts []Account
 				if _, err := q.GetAll(c, &accounts); err != nil {
