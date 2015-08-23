@@ -4,11 +4,11 @@
     {{ if .User }}
     <table class="table table-striped">
         <thead>
-            <tr><th>ID</th><th>date</th><th>account</th></tr>
+            <tr><th>ID</th><th>application</th><th>date</th></tr>
         </thead>
         <tbody>
         {{range .Registrations}}
-            <tr><td>{{.ID}}</td><td>{{.Date}}</td><td>{{.Account}}</td></tr>
+            <tr><td>{{.ID}}</td><td>{{.App}}</td><td>{{.Date}}</td></tr>
         {{end}}
         </tbody>
     </table>

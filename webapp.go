@@ -79,10 +79,9 @@ func registerHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 		return nil
 	}
 	reg := &Registration{
-		ID:      id,
-		App:     app,
-		Account: c.user.Email,
-		Date:    time.Now().Unix(),
+		ID:   id,
+		App:  app,
+		Date: time.Now().Unix(),
 	}
 	return reg.Save(c)
 }
