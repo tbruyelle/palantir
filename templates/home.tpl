@@ -14,8 +14,8 @@
     </table>
     {{else}}
     <div class="jumbotron">
-      <h1>Hello, World!</h1>
-      <p>Welcome to your new Go web project.</p>
+      <h1>Welcome</h1>
+      <p>Connect to your google account.</p>
     </div>
     {{end}}
   </div>

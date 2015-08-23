@@ -26,6 +26,7 @@ func FindAccount(c appengine.Context) *datastore.Query {
 
 type Registration struct {
 	ID      string
+	App     string
 	Account string
 	Date    int64
 }
