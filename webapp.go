@@ -1,4 +1,4 @@
-package appengine_bootstrap
+package palantir
 
 import (
 	"appengine/user"
