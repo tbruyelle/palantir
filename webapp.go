@@ -70,31 +70,19 @@ func registerHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 		http.Error(w, "Missing parameter", http.StatusBadRequest)
 		return nil
 	}
-	app := r.FormValue("app")
-	if app == "" {
+	appName := r.FormValue("app")
+	if appName == "" {
 		http.Error(w, "Missing parameter", http.StatusBadRequest)
 		return nil
 	}
 	// Check if registration exists
-	q := FindRegistration(c).Filter("ID=", id).Filter("App=", app)
-	var registrations []Registration
-	if _, err := q.GetAll(c, &registrations); err != nil {
+	reg, err := FindRegistrationByIDAndName(c, id, appName)
+	if err != nil {
 		return err
 	}
-	if len(registrations) > 0 {
-		// Registration found, find the corresponding App
-		reg := registrations[0]
-		q = FindApp(c).Filter("Name=", reg.App)
-		var apps []App
-		if _, err := q.GetAll(c, &apps); err != nil {
-			return err
-		}
-		tryDuration := DefaultTryDuration
-		if len(apps) > 1 {
-			tryDuration = apps[0].TryDuration
-		}
+	if reg != nil {
 		// Check if tryDuration has expired
-		if reg.HasExpired(tryDuration) {
+		if reg.HasExpired() {
 			// tryDuration expired
 			c.Infof("expired %+v", reg)
 			fmt.Fprintf(w, "EXPIRED")
@@ -105,13 +93,26 @@ func registerHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 		return nil
 	}
 	// Not found create it
-	reg := &Registration{
-		ID:   id,
-		App:  app,
-		Date: time.Now().Unix(),
-	}
-	err := reg.Save(c)
+	// First, find corresponding app
+	app, err := FindAppByName(c, appName)
 	if err != nil {
+		return err
+	}
+	if app == nil {
+		// Not found create it
+		app = &App{appName, DefaultTryDuration}
+		if err = app.Save(c); err != nil {
+			return err
+		}
+	}
+
+	reg = &Registration{
+		ID:          id,
+		App:         appName,
+		Date:        time.Now().Unix(),
+		TryDuration: app.TryDuration,
+	}
+	if err = reg.Save(c); err != nil {
 		return err
 	}
 	c.Infof("Created %+v", reg)

@@ -24,6 +24,18 @@ func FindApp(c appengine.Context) *datastore.Query {
 	return datastore.NewQuery("App").Ancestor(appKey(c))
 }
 
+func FindAppByName(c appengine.Context, name string) (*App, error) {
+	q := FindApp(c).Filter("Name=", name)
+	var apps []App
+	if _, err := q.GetAll(c, &apps); err != nil {
+		return nil, err
+	}
+	if len(apps) == 0 {
+		return nil, nil
+	}
+	return &apps[0], nil
+}
+
 type Account struct {
 	Email      string
 	Authorized bool
@@ -44,9 +56,10 @@ func FindAccount(c appengine.Context) *datastore.Query {
 }
 
 type Registration struct {
-	ID   string
-	App  string
-	Date int64
+	ID          string
+	App         string
+	Date        int64
+	TryDuration int
 }
 
 func registrationKey(c appengine.Context) *datastore.Key {
@@ -61,4 +74,16 @@ func (r *Registration) Save(c appengine.Context) error {
 
 func FindRegistration(c appengine.Context) *datastore.Query {
 	return datastore.NewQuery("Registration").Ancestor(registrationKey(c))
+}
+
+func FindRegistrationByIDAndName(c appengine.Context, id, name string) (*Registration, error) {
+	q := FindRegistration(c).Filter("ID=", id).Filter("App=", name)
+	var regs []Registration
+	if _, err := q.GetAll(c, &regs); err != nil {
+		return nil, err
+	}
+	if len(regs) == 0 {
+		return nil, nil
+	}
+	return &regs[0], nil
 }
