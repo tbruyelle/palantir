@@ -7,7 +7,7 @@ import (
 
 type App struct {
 	Name        string
-	TryDuration int64
+	TryDuration int
 }
 
 func appKey(c appengine.Context) *datastore.Key {

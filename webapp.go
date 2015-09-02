@@ -62,7 +62,7 @@ func logoutHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 }
 
 // Default try duration 15j
-const DefaultTryDuration int64 = 15 * 3600
+const DefaultTryDuration = 15
 
 func registerHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 	id := r.FormValue("id")
@@ -94,7 +94,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 			tryDuration = apps[0].TryDuration
 		}
 		// Check if tryDuration has expired
-		if reg.Date+tryDuration < time.Now().Unix() {
+		if reg.HasExpired(tryDuration) {
 			// tryDuration expired
 			c.Infof("expired %+v", reg)
 			fmt.Fprintf(w, "EXPIRED")
