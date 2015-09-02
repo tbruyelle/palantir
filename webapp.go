@@ -16,6 +16,7 @@ func init() {
 	r.Handle("/login", handle(loginHandler)).Methods("GET")
 	r.Handle("/logout", handle(logoutHandler)).Methods("GET")
 	r.Handle("/register", handle(registerHandler)).Methods("GET")
+	r.Handle("/app", handleLogged(appHandler)).Methods("GET")
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request, c Context) error {
@@ -118,4 +119,16 @@ func registerHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 	c.Infof("Created %+v", reg)
 	fmt.Fprintf(w, "OK")
 	return nil
+}
+
+func appHandler(w http.ResponseWriter, r *http.Request, c Context) error {
+	var apps []App
+	if _, err := FindApp(c).GetAll(c, &apps); err != nil {
+		return nil
+	}
+	data := struct {
+		User *user.User
+		Apps []App
+	}{c.user, apps}
+	return tmpl(w, "apps.tpl", data)
 }
