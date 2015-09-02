@@ -4,11 +4,16 @@
     {{ if .User }}
     <table class="table table-striped">
         <thead>
-            <tr><th>ID</th><th>application</th><th>date</th></tr>
+            <tr><th>ID</th><th>Application</th><th>Date</th><th>Try duration</th></tr>
         </thead>
         <tbody>
         {{range .Registrations}}
-            <tr><td>{{.ID}}</td><td>{{.App}}</td><td>{{.Date | formatDate}}</td></tr>
+            <tr>
+                <td>{{.ID}}</td>
+                <td>{{.App}}</td>
+                <td>{{.Date | formatDate}}</td>
+                <td><span class="label {{if .HasExpired}}label-default{{else}}label-success{{end}}">{{.TryDuration}}</span></td>
+            </tr>
         {{end}}
         </tbody>
     </table>
