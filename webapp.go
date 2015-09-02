@@ -12,7 +12,7 @@ func init() {
 	r := mux.NewRouter()
 
 	http.Handle("/", r)
-	r.Handle("/", handleLogged(rootHandler)).Methods("GET")
+	r.Handle("/", handle(rootHandler)).Methods("GET")
 	r.Handle("/login", handle(loginHandler)).Methods("GET")
 	r.Handle("/logout", handle(logoutHandler)).Methods("GET")
 	r.Handle("/register", handle(registerHandler)).Methods("GET")

@@ -36,25 +36,6 @@ func FindAppByName(c appengine.Context, name string) (*App, error) {
 	return &apps[0], nil
 }
 
-type Account struct {
-	Email      string
-	Authorized bool
-}
-
-func accountKey(c appengine.Context) *datastore.Key {
-	return datastore.NewKey(c, "Account", "default_account", 0, nil)
-}
-
-func (a *Account) Save(c appengine.Context) error {
-	key := datastore.NewIncompleteKey(c, "Account", accountKey(c))
-	_, err := datastore.Put(c, key, a)
-	return err
-}
-
-func FindAccount(c appengine.Context) *datastore.Query {
-	return datastore.NewQuery("Account").Ancestor(accountKey(c))
-}
-
 type Registration struct {
 	ID          string
 	App         string
