@@ -48,7 +48,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 func loginHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 	url, err := user.LoginURL(c, "/")
 	if err != nil {
-		return nil
+		return err
 	}
 	http.Redirect(w, r, url, http.StatusFound)
 	return nil
@@ -57,7 +57,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 func logoutHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 	url, err := user.LogoutURL(c, "/")
 	if err != nil {
-		return nil
+		return err
 	}
 	http.Redirect(w, r, url, http.StatusFound)
 	return nil
@@ -68,14 +68,9 @@ const DefaultTryDuration = 15
 
 func registerHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 	id := r.FormValue("id")
-	if id == "" {
-		http.Error(w, "Missing parameter", http.StatusBadRequest)
-		return nil
-	}
 	appName := r.FormValue("app")
-	if appName == "" {
-		http.Error(w, "Missing parameter", http.StatusBadRequest)
-		return nil
+	if id == "" || appName == "" {
+		return missingParamError()
 	}
 	// Check if registration exists
 	reg, err := FindRegistrationByIDAndName(c, id, appName)
@@ -124,14 +119,9 @@ func registerHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 
 func expireHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 	id := r.FormValue("id")
-	if id == "" {
-		http.Error(w, "Missing parameter", http.StatusBadRequest)
-		return nil
-	}
 	appName := r.FormValue("app")
-	if appName == "" {
-		http.Error(w, "Missing parameter", http.StatusBadRequest)
-		return nil
+	if id == "" || appName == "" {
+		return missingParamError()
 	}
 	// Check if registration exists
 	reg, err := FindRegistrationByIDAndName(c, id, appName)
@@ -139,8 +129,7 @@ func expireHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 		return err
 	}
 	if reg == nil {
-		http.Error(w, "Registration not found", http.StatusNotFound)
-		return nil
+		return httpError{"Registration not found", http.StatusNotFound}
 	}
 	reg.Date = 0
 	reg.Save(c)
@@ -151,7 +140,7 @@ func expireHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 func appHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 	var apps []App
 	if _, err := FindApp(c).GetAll(c, &apps); err != nil {
-		return nil
+		return err
 	}
 	data := struct {
 		User *user.User

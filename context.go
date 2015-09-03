@@ -38,7 +38,24 @@ func _handle(h ctxHandler, assertLogged bool) http.HandlerFunc {
 		}
 		err := h(w, r, c)
 		if err != nil {
+			if herr, ok := err.(httpError); ok {
+				http.Error(w, herr.Error(), herr.status)
+				return
+			}
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}
+}
+
+type httpError struct {
+	msg    string
+	status int
+}
+
+func (h httpError) Error() string {
+	return h.msg
+}
+
+func missingParamError() httpError {
+	return httpError{"Missing Parameter", http.StatusBadRequest}
 }
