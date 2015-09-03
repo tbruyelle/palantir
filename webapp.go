@@ -16,6 +16,7 @@ func init() {
 	r.Handle("/login", handle(loginHandler)).Methods("GET")
 	r.Handle("/logout", handle(logoutHandler)).Methods("GET")
 	r.Handle("/register", handle(registerHandler)).Methods("GET")
+	r.Handle("/expire", handle(expireHandler)).Methods("GET")
 	r.Handle("/app", handleLogged(appHandler)).Methods("GET")
 }
 
@@ -117,6 +118,32 @@ func registerHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 		return err
 	}
 	c.Infof("Created %+v", reg)
+	fmt.Fprintf(w, "OK")
+	return nil
+}
+
+func expireHandler(w http.ResponseWriter, r *http.Request, c Context) error {
+	id := r.FormValue("id")
+	if id == "" {
+		http.Error(w, "Missing parameter", http.StatusBadRequest)
+		return nil
+	}
+	appName := r.FormValue("app")
+	if appName == "" {
+		http.Error(w, "Missing parameter", http.StatusBadRequest)
+		return nil
+	}
+	// Check if registration exists
+	reg, err := FindRegistrationByIDAndName(c, id, appName)
+	if err != nil {
+		return err
+	}
+	if reg == nil {
+		http.Error(w, "Registration not found", http.StatusNotFound)
+		return nil
+	}
+	reg.Date = 0
+	reg.Save(c)
 	fmt.Fprintf(w, "OK")
 	return nil
 }
