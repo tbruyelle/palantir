@@ -63,8 +63,8 @@ func logoutHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 	return nil
 }
 
-// Default try duration 15j
-const DefaultTryDuration = 15
+// Default try duration 10j
+const DefaultTryDuration = 10
 
 func registerHandler(w http.ResponseWriter, r *http.Request, c Context) error {
 	id := r.FormValue("id")
